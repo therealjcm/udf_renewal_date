@@ -71,7 +71,7 @@ ipced_parse_date(char *the_date)
 				rv->day = tmp_month;
 			}
 			if (!is_valid_ipced_date(rv)) goto error_exit;
-            sprintf(rv->date_str, "%d-%02d-%02d", rv->year, rv->month, rv->day);
+            		sprintf(rv->date_str, "%d-%02d-%02d", rv->year, rv->month, rv->day);
 			return rv;
 		}
 	}
