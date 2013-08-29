@@ -46,6 +46,7 @@ ipced_date_t *
 ipced_parse_date(char *the_date)
 {
 	ipced_date_t *rv = malloc(sizeof(ipced_date_t));
+	if (!rv) return NULL;
 	int arg_len = strlen(the_date);
 	if (arg_len == 8) {
 		if (sscanf(the_date, "%2d%2d%4d", &(rv->month), &(rv->day), &(rv->year)) == 3) {
@@ -68,11 +69,9 @@ ipced_parse_date(char *the_date)
 				int tmp_month = rv->month;
 				rv->month = rv->day;
 				rv->day = tmp_month;
-				if (!is_valid_ipced_date(rv)) goto error_exit;
-			} else {
-				if (!is_valid_ipced_date(rv)) goto error_exit;
 			}
-			sprintf(rv->date_str, "%d-%02d-%02d", rv->year, rv->month, rv->day);
+			if (!is_valid_ipced_date(rv)) goto error_exit;
+            sprintf(rv->date_str, "%d-%02d-%02d", rv->year, rv->month, rv->day);
 			return rv;
 		}
 	}
@@ -86,15 +85,15 @@ my_bool
 udf_renewal_date_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
 {
 	if (args->arg_count != 1) {
-		strcpy(message, "udf_echostr can only accept a single string arg");
+		strcpy(message, "udf_renewal_date can only accept a single string arg");
 		return 1;
 	}
 	if (args->arg_type[0] != STRING_RESULT) {
-		strcpy(message, "udf_echostr arg must be string");
+		strcpy(message, "udf_renewal_date arg must be string");
 		return 1;
 	}
 	if (!args->args[0]) {
-		strcpy(message, "udf_echostr arg must not be null");
+		strcpy(message, "udf_renewal_date arg must not be null");
 		return 1;
 	}
 
