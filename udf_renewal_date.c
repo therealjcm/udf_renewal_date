@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <mysql/mysql.h>
+#include <time.h>
+#include <sys/time.h>
 
 
 #define IPCED_DATE_STR_LEN 10
@@ -158,8 +160,11 @@ udf_past_renewal_date_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
 long long
 udf_past_renewal_date(UDF_INIT *initid, UDF_ARGS *args, char *is_null, char *error)
 {
+	time_t t = time(NULL);
+	struct tm *now = localtime(&t);
+
 	ipced_date_t *rv = (ipced_date_t *)initid->ptr;
-	if (rv->year < today->year || rv->month < today->month || rv->day < today->day)
+	if ((rv->year-1900) < now->tm_year || rv->month < (now->tm_mon+1) || rv->day < now->tm_mday)
 		return 1;
 	else
 		return 0;
@@ -171,5 +176,3 @@ udf_past_renewal_date_deinit(UDF_INIT *initid)
 {
 	free(initid->ptr);
 }
-
-
