@@ -125,4 +125,51 @@ udf_renewal_date_deinit(UDF_INIT *initid)
 	free(initid->ptr);
 }
 
+/* ctor */
+my_bool
+udf_past_renewal_date_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
+{
+	if (args->arg_count != 1) {
+		strcpy(message, "udf_past_renewal_date can only accept a single string arg");
+		return 1;
+	}
+	if (args->arg_type[0] != STRING_RESULT) {
+		strcpy(message, "udf_past_renewal_date arg must be string");
+		return 1;
+	}
+	if (!args->args[0]) {
+		strcpy(message, "udf_past_renewal_date arg must not be null");
+		return 1;
+	}
+
+	ipced_date_t *ipced_date = ipced_parse_date(args->args[0]);
+	if (!ipced_date) {
+		strcpy(message, "udf_past_renewal_date format error");
+		return 1;
+	}
+	initid->ptr = (char *)ipced_date;
+	initid->max_length = IPCED_DATE_STR_LEN;
+
+	return 0;
+
+}
+
+/* get int */
+long long
+udf_past_renewal_date(UDF_INIT *initid, UDF_ARGS *args, char *is_null, char *error)
+{
+	ipced_date_t *rv = (ipced_date_t *)initid->ptr;
+	if (rv->year < today->year || rv->month < today->month || rv->day < today->day)
+		return 1;
+	else
+		return 0;
+}
+
+/* dtor */
+void
+udf_past_renewal_date_deinit(UDF_INIT *initid)
+{
+	free(initid->ptr);
+}
+
 
